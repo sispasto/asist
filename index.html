@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi PWA con Apps Script</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.png" />
+  <meta name="theme-color" content="#0d47a1" />
+</head>
+<body style="margin:0">
+  <iframe src="https://script.google.com/a/macros/envia.co/s/AKfycbzjqrbs7ghv8p47G5y2czj0VKQaIwMBszdtWUM1r2bxDNWGJSpfdpvHPNAjHAcHPvwGdw/exec" width="100%" height="100%" style="border:none; position:fixed; top:0; left:0; width:100vw; height:100vh;"></iframe>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js');
+    }
+  </script>
+</body>
+</html>
