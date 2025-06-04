@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mi PWA con Apps Script</title>
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="asist/manifest.json" />
   <link rel="icon" href="icon.png" />
   <meta name="theme-color" content="#0d47a1" />
 </head>
@@ -13,7 +13,7 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js');
+      navigator.serviceWorker.register('asist/service-worker.js');
     }
   </script>
 </body>
