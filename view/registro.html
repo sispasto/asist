@@ -138,7 +138,7 @@ var nsRegistro=(function(){
     var icono2 = "/asist/assets/time-2.png"; //icono naranja marco tarde     
     var icono3 = "/asist/assets/time-3.png"; //icono rojo marco tarde  tarde   
     var iconopregunta = "/asist/assets/question.png"; // Por defecto: no marcó icono pregunta
-    
+    var dataForm = null;
     /****************************************Obteniendo la ubicación actual********************************/
     let latitude='';
     let longitude='';
@@ -175,16 +175,16 @@ var nsRegistro=(function(){
         }catch (e) {
           errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
         }
-      }else{google.script.run.withSuccessHandler(writeFolderPath).readSheetsURL();
+      }else{
         alertSMS("Lo sentimos, el navegador no soporta la geolocalización!"); 
       }
     }
     
-    /****************************************Definiación de variables globales**************************************/
-    var folderPathIMG="";//variable que guarda id de carpeta donde se guardan las imagenes
+    /****************************************Definiación de variables globales**************************************/   
     //var arrayGlobal=[];//arreglo de promotores
     var banPromotor=0;//variable para determinar si el promotor fue encontrado    
-    let submitDesdeBoton = false;
+    let submitDesdeBoton = false;    
+    let canvas = null;
     /******************************************************************************************************/
     /****************************************Definición de eventos HTML***********************************/  
     document.querySelectorAll('input[type=number]').forEach( node => node.addEventListener('keypress', e => {
@@ -226,6 +226,7 @@ var nsRegistro=(function(){
       document.getElementById("namePromotor").textContent = "";
       document.getElementById("formulario").reset();
       banPromotor = 0; nsModal.numClic=0;
+      let canvas = nsRegistro.getCanvas();
       var context = canvas.getContext('2d');      
       context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -246,7 +247,8 @@ var nsRegistro=(function(){
 
     async function procesarFormulario(event, formulario) {
       event.preventDefault();
-
+      
+      dataForm = Object.fromEntries(new FormData(formulario).entries());
       let codnomina = document.getElementById("codnomina").value;
 
       if (codnomina === "") {
@@ -351,10 +353,11 @@ var nsRegistro=(function(){
     /*************************************Guardar Imagen***************************************************/
     function saveImage(){ 
       if( nsModal.numClic > 0 ){
-        crearLoader();
+        crearLoader(); 
+        let canvas = nsRegistro.getCanvas();
         let dataURi = canvas.toDataURL('image/png');
-        let idImg = document.getElementById("codnomina").value + "-" + document.getElementById("fecha").value;
-        google.script.run.withSuccessHandler(successFull,errorUpload).doUpload(dataURi,idImg,folderPathIMG);
+        let idImg = document.getElementById("codnomina").value + "-" + document.getElementById("fecha").value;  
+        subirImagen(dataURi,idImg,folderPathIMG);  
       }
       else{
         alertSMS("La fotografía es necesaria");
@@ -363,9 +366,69 @@ var nsRegistro=(function(){
         
     function successFull(data){ //console.log("devuelta:" + data ); //console.log(data.url); 
       document.getElementById("pathIMG").value = data.url;
-      document.getElementById("IDImg").value = data.fileID;
-      google.script.run.withSuccessHandler(escribioHoja,errorescrituraHoja).escribirDatosEnSheets(formulario)//wrute h       
+      document.getElementById("IDImg").value = data.fileID;       
+      enviarFormularioConFetch(dataForm); 
     }
+
+    function enviarFormularioConFetch() {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: new URLSearchParams({
+          action: 'escribirDatosEnSheets', // Puedes cambiarlo según cómo lo procese tu backend
+          ...dataForm
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        escribioHoja(data);
+      })
+      .catch(error => {
+        errorescrituraHoja(error);
+      });
+    }
+
+    function errorUpload(data){ 
+      eliminarLoader();
+      document.getElementById("fecha").value = "";
+      document.getElementById("hora").value = "";//hours+':'+minutes; 
+      document.getElementById("coordenadas").value= "";
+      document.getElementById("mapa").value= "";
+      latitude='';
+      longitude='';
+    }
+
+    async function subirImagen(dataURI, idImg, folderPathIMG) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: new URLSearchParams({
+            action: 'doUpload',
+            data: dataURI,
+            idImg: idImg,
+            folderPathIMG: folderPathIMG
+          })
+        });
+
+        const result = await response.json();
+
+        if (result.status) { 
+          successFull(result);  // llama tu función de éxito          
+        } else {
+          errorUpload("No se pudo subir la imagen"); //         
+        }
+
+      } catch (error) {
+        console.error("Error en fetch:", error);
+        errorUpload(error.message || "Error en la conexión");
+      }
+    }
+
 
     function escribioHoja(datos) {
       const { E1, S1, E2, S2, sms, existeMarcacion } = datos;
@@ -428,20 +491,22 @@ var nsRegistro=(function(){
       eliminarLoader();
       alertSMS("No se pudieron registrar los datos vuelva a intentar"); 
     }
-
-    function errorUpload(data){ 
-      eliminarLoader();
-      document.getElementById("fecha").value = "";
-      document.getElementById("hora").value = "";//hours+':'+minutes; 
-      document.getElementById("coordenadas").value= "";
-      document.getElementById("mapa").value= "";
-      latitude='';
-      longitude='';
-    }
     
-    /******************************************************************************************************/
-     return{
-      procesarFormulario
+    /******************************************************************************************************/    
+    
+     function setCanvas(c) {
+      canvas = c;
+     }
+
+     function getCanvas() {
+        return canvas;
+     }
+
+      // Expone las funciones públicas del módulo
+    return {
+        procesarFormulario,
+        setCanvas,
+        getCanvas
     };
     
   })();

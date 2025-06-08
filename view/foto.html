@@ -51,9 +51,7 @@
 
       const video = document.getElementById('video');
       const snap = document.getElementById('snap');
-      const canvas = document.getElementById('canvas');
-      
-      //document.querySelector('#opencamera').addEventListener('click', openCamera);
+      const canvas = document.getElementById('canvas');           
 
       document.addEventListener('click', function(e) { 
         if (e.target && e.target.id === 'opencamera') {
@@ -61,21 +59,16 @@
         }
       });
 
-      /*snap.addEventListener('click', function () { //este guarda mas calidad de la imagen mas grande
-        let context = canvas.getContext('2d');       
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);La imagen seria tal cual la resolucion del video
-        nsModal.numClic = numClic + 1;
-      });*/
-
       snap.addEventListener('click', function () {
         let context = canvas.getContext('2d');
-        canvas.width = 320;  // fijar tamaño para menor peso
+        canvas.width = 320;
         canvas.height = 240;
-        context.drawImage(video, 0, 0, 320, 240);
-        nsModal.numClic = numClic + 1;
+        context.drawImage(video, 0, 0, 320, 240);      
+        nsRegistro.setCanvas( canvas );  // Aquí ya guardas la referencia
+        nsModal.numClic = 1; // Lo pones manualmente a 1 si la foto fue tomada
       });
 
-      myModalEl.addEventListener('hidden.bs.modal', function () {
+      myModalEl.addEventListener('hidden.bs.modal', function () {        
         // Detener la cámara si está activa
         if (objCamera != null) {
           objCamera.getTracks().forEach(track => track.stop()); // Detener todos los tracks
@@ -85,11 +78,7 @@
         // Limpieza adicional por si el fondo no se elimina
         const backdrop = document.querySelector('.modal-backdrop');
         if (backdrop) backdrop.remove();
-
-        // Opcional: limpiar el canvas y video por si quieres resetear
-        video.srcObject = null;
-        const context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        
       });
 
       
@@ -140,7 +129,8 @@
       }
 
       return {
-        numClic: numClic
+        numClic: numClic,
+        canvas: canvas
       };
 
     })();

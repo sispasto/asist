@@ -1,5 +1,7 @@
 const templateCache = {};
-var arrayGlobal = [];
+var arrayGlobal = []; //array de promotores
+var folderPathIMG="";//variable que guarda id de carpeta donde se guardan las imagenes
+
 const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec";
 
 document.addEventListener("DOMContentLoaded", async function () {   
@@ -77,20 +79,19 @@ async function getArrayPromotors() {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
       },
-      body: new URLSearchParams({ action: 'getPromotors' })
+      body: new URLSearchParams({ action: 'getPromotoresYUrl' })
     });
 
     const data = await response.json();
 
     if (data.status === 'success') {
-      arrayGlobal = data.data;
+      arrayGlobal = data.data.promotores; // Promotores
+      folderPathIMG = data.data.urlImagenes; // URL de imágenes      
     } else {
-      //alertSMS(data.mensaje || "Error al obtener promotores");
-      console.log( data.mensaje );
+      console.log(data.mensaje || "Error al obtener promotores");
     }
   } catch (error) {
     console.error('Error:', error);
-    //alertSMS("Error en la conexión");
   }
 }
 
