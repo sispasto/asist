@@ -199,7 +199,7 @@
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
           },
           body: new URLSearchParams({
-            accion: 'login', // 👈 CAMBIADO a "accion"
+            accion: 'login', // 
             usuario: usuario,
             clave: clave
           })
@@ -207,7 +207,7 @@
         .then(response => response.json())
         .then(data => {
           if (data.status === 'success') {
-            const resultado = data.usuario; // 👈 CAMBIADO a "usuario"
+            const resultado = data.usuario; // 
 
             if (resultado.tipo === 'admin') {
               document.getElementById('navbarItemsDefault').style.display = 'none';
@@ -233,7 +233,7 @@
               alertSMS("Autenticación correcta");
             }
           } else {
-            alertSMS(data.mensaje || "Usuario o clave incorrectos"); // 👈 CAMBIADO a "mensaje"
+            alertSMS(data.mensaje || "Usuario o clave incorrectos"); // 
           }
         })
         .catch(error => {
