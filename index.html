@@ -167,8 +167,7 @@
     <main class="container-fluid p-0 m-0 text-center" id="App"></main>
     <script src="js/main.js"></script>   
 
-    <script>
-      alert("Si señores pues");
+    <script>     
       sessionStorage.setItem('nombreUsuario', 'Invitado');//Creo variable de session para usuario
       sessionStorage.setItem('codigoUsuario', '0');// inicia en cero quiere decir que no se ha logeado
       sessionStorage.setItem('rol',0)//No se ha logueado ningun usuario
@@ -266,22 +265,40 @@
 
       // Actualizar contraseña
       function updatePassword() {
+        const usuario = sessionStorage.getItem('codigoUsuario');
+        const claveNueva = document.getElementById('newPassword').value;
+        const confirmacionClave = document.getElementById('confirmNewPassword').value;
+        const changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
 
-        var usuario = sessionStorage.getItem('codigoUsuario').toString();
-        var claveNueva = document.getElementById('newPassword').value;
-        var confirmacionclave = document.getElementById('confirmNewPassword').value;        
-        var changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
-
-        if( claveNueva === confirmacionclave ){
-            google.script.run.withSuccessHandler(function(mensaje) {            
-            changePasswordModal.hide();
-            bsCollapse.hide();
-            alertSMS("Clave actualizada exitosamente");
-          }).actualizarClave(usuario, claveNueva);
-        }
-        else{
+        if (claveNueva === confirmacionClave) {
+          fetch('https://script.google.com/a/macros/envia.co/s/AKfycbwTXylM3DyLfUvtYshnF5OtwOXZ0E-UoHiCvMWrrXhWs4aWqL8O1WdkbMTDuLmmiT27/exec', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: new URLSearchParams({
+              action: 'cambiar_clave',
+              usuario: usuario,
+              claveNueva: claveNueva
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              changePasswordModal.hide();
+              bsCollapse.hide();
+              alertSMS("Clave actualizada exitosamente");
+            } else {
+              alertSMS(data.mensaje || "No se pudo actualizar la clave");
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alertSMS("Error en la conexión");
+          });
+        } else {
           alertSMS("Las claves no coinciden");
-        }        
+        }
       }
 
     </script>
