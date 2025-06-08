@@ -1,63 +1,10 @@
 const templateCache = {};
 var arrayGlobal = [];
+const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec";
 
-document.addEventListener("DOMContentLoaded", async function () { 
-  
+document.addEventListener("DOMContentLoaded", async function () {   
   getHome();
-    //google.script.run.withSuccessHandler(writeVar).readDataSheets();
-  
 });
-
-async function importarTemplates(urls = []) {
-  let exito = true;
-
-  const cargar = urls.map(async (url) => {
-    if (templateCache[url]) return;
-
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Error cargando ${url}`);
-      const text = await res.text();
-
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = text.trim();
-
-      // Insertar <template> al body
-      tempDiv.querySelectorAll("template").forEach(template => {
-        templateCache[url] = template;
-        document.body.appendChild(template);
-      });
-
-      // Ejecutar <script> internos
-      tempDiv.querySelectorAll("script").forEach(oldScript => {
-        const newScript = document.createElement("script");
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-        document.body.appendChild(newScript);
-      });
-
-      // Insertar <style> al <head>
-      tempDiv.querySelectorAll("style").forEach(styleEl => {
-        document.head.appendChild(styleEl.cloneNode(true));
-      });
-
-      // Insertar <link rel="stylesheet"> si hay
-      tempDiv.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-        document.head.appendChild(link.cloneNode(true));
-      });
-
-    } catch (e) {
-      console.error(`Fallo al cargar ${url}:`, e);
-      exito = false;
-    }
-  });
-
-  await Promise.all(cargar);
-  return exito;
-}
 
 function getRegistro() {
   let main = document.getElementById('App');
@@ -67,15 +14,7 @@ function getRegistro() {
   main.appendChild(registro);
   const foto = document.createElement('foto-component');
   foto.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
-  main.appendChild(foto);
-
-  /*let frmRegistro = document.getElementById('registro');
-  let frmFoto = document.getElementById('foto');
-  main.appendChild(frmRegistro.content.cloneNode(true));
-  main.appendChild(frmFoto.content.cloneNode(true));*/
-
-  // Ahora sí puedes buscar el botón porque ya está en el DOM
-  //document.querySelector('#opencamera')?.addEventListener('click', nsModal.openCamera);  
+  main.appendChild(foto); 
 }
 
 function getHome() {
@@ -131,8 +70,28 @@ function getNomina() {
   main.appendChild(frmInformes.content.cloneNode(true));
 }
 
-function writeVar(arrayPromotors) {
-  arrayGlobal = arrayPromotors.slice();
+async function getArrayPromotors() {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: new URLSearchParams({ action: 'getPromotors' })
+    });
+
+    const data = await response.json();
+
+    if (data.status === 'success') {
+      arrayGlobal = data.data;
+    } else {
+      //alertSMS(data.mensaje || "Error al obtener promotores");
+      console.log( data.mensaje );
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    //alertSMS("Error en la conexión");
+  }
 }
 
 function crearLoader() {

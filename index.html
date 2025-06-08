@@ -192,7 +192,7 @@
       }
 
       function validarUsuario(usuario, clave) {
-        fetch('https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec', {
+        fetch(API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
@@ -246,9 +246,6 @@
           alertSMS("Error en la conexión");
         });
       }
-
-
-
       // Función para cerrar sesión
       function logout() {
         // dejar la opción por defecto
@@ -279,7 +276,7 @@
         const changePasswordModal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
 
         if (claveNueva === confirmacionClave) {
-          fetch('https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec', {
+          fetch(API_URL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'

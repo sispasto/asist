@@ -54,16 +54,16 @@
                   <div class="container text-center">
                     <div class="row">
                       <div class="col-3">
-                       <img id="icon-e1" class="icono" src="https://drive.google.com/thumbnail?id=1Yb5T-Y4DuLW4uRQ2qiuKjoXhO7RQYi5l" alt="E1">      
+                       <img id="icon-e1" class="icono" src="/asist/assets/question.png" alt="E1">      
                       </div>
                       <div class="col-3">
-                        <img id="icon-s1" class="icono" src="https://drive.google.com/thumbnail?id=1Yb5T-Y4DuLW4uRQ2qiuKjoXhO7RQYi5l" alt="S1">     
+                        <img id="icon-s1" class="icono" src="/asist/assets/question.png" alt="S1">     
                       </div>
                       <div class="col-3">
-                        <img id="icon-e2" class="icono" src="https://drive.google.com/thumbnail?id=1Yb5T-Y4DuLW4uRQ2qiuKjoXhO7RQYi5l" alt="E2">      
+                        <img id="icon-e2" class="icono" src="/asist/assets/question.png" alt="E2">      
                       </div>
                       <div class="col-3">
-                        <img id="icon-s2" class="icono" src="https://drive.google.com/thumbnail?id=1Yb5T-Y4DuLW4uRQ2qiuKjoXhO7RQYi5l" alt="S2">
+                        <img id="icon-s2" class="icono" src="/asist/assets/question.png" alt="S2">
                       </div>
                     </div>
                     <div class="row">
@@ -131,12 +131,13 @@
   </div>
 </div>
 <script>    
+getArrayPromotors();
 var nsRegistro=(function(){ 
     /******************************************************************************************************/
-    var icono1 = ""; //icono verde marco a tiempo
-    var icono2 = ""; //icono naranja marco tarde     
-    var icono3 = ""; //icono naranja marco tarde     
-    var iconopregunta = ""; // Por defecto: no marcó icono pregunta
+    var icono1 = "/asist/assets/time-1.png"; //icono verde marco a tiempo
+    var icono2 = "/asist/assets/time-2.png"; //icono naranja marco tarde     
+    var icono3 = "/asist/assets/time-3.png"; //icono rojo marco tarde  tarde   
+    var iconopregunta = "/asist/assets/question.png"; // Por defecto: no marcó icono pregunta
     
     /****************************************Obteniendo la ubicación actual********************************/
     let latitude='';
@@ -271,98 +272,73 @@ var nsRegistro=(function(){
         alertSMS("Ocurrió un error inesperado al procesar el formulario.");
       }
     }
-    
-    function readSheetsURLAsync() {
-      return new Promise((resolve, reject) => {
-        google.script.run
-          .withSuccessHandler(resolve)
-          .withFailureHandler(reject)
-          .readSheetsURL();
-      });
-    }
 
-    async function inicializar() {
-      try {
-        const resultado = await readSheetsURLAsync();
-        folderPathIMG = resultado.carpetaImagenesId;
+    async function getPromotor() {
+      crearLoader();
+      const codnomina = document.getElementById("codnomina").value;
+      const promotor = arrayGlobal.filter(elemento => elemento[0] == codnomina);
 
-        for (let nombre in resultado.iconos) {
-          if (nombre === "time-1.png")
-            icono1 = "https://drive.google.com/thumbnail?id=" + resultado.iconos[nombre];
-          else if (nombre === "time-2.png")
-            icono2 = "https://drive.google.com/thumbnail?id=" + resultado.iconos[nombre];
-          else if (nombre === "time-3.png")
-            icono3 = "https://drive.google.com/thumbnail?id=" + resultado.iconos[nombre];
-          else if (nombre === "question.png")
-            iconopregunta = "https://drive.google.com/thumbnail?id=" + resultado.iconos[nombre];
+      if (promotor.length > 0) {
+        banPromotor = 1;
+        document.getElementById("namePromotor").innerHTML = promotor[0][1].toString().toUpperCase();
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              action: "obtenerMarcacionesDelDia",
+              codnomina: codnomina
+            })
+          });
+
+          const result = await response.json();
+
+          if (result.status === "success") {
+            const marcaciones = result.data;
+            asignarIcono("e1", marcaciones.E1.estado);
+            asignarIcono("s1", marcaciones.S1.estado);
+            asignarIcono("e2", marcaciones.E2.estado);
+            asignarIcono("s2", marcaciones.S2.estado);
+            asignarHora("he1", marcaciones.E1.hora);
+            asignarHora("hs1", marcaciones.S1.hora);
+            asignarHora("he2", marcaciones.E2.hora);
+            asignarHora("hs2", marcaciones.S2.hora);
+            eliminarLoader();
+            return true;
+          } else {
+            throw new Error(result.mensaje || "Error al obtener marcaciones.");
+          }
+
+        } catch (error) {
+          console.error("Error al obtener marcaciones:", error.message);
+          alertSMS("Error al obtener marcaciones, vuelva a intentarlo");
+          eliminarLoader();
+          return false;
         }
+
+      } else {
+        banPromotor = 0;
+        document.getElementById("namePromotor").innerHTML = "";
+        document.getElementById("fecha").value = "";
+        document.getElementById("hora").value = "";
+        document.getElementById("coordenadas").value = "";
+        document.getElementById("pathIMG").value = "";
+        document.getElementById("mapa").value = "";
         asignarIcono("e1", "");
         asignarIcono("s1", "");
         asignarIcono("e2", "");
         asignarIcono("s2", "");
-      } catch (error) {
-        console.error("Error al cargar datos:", error);
+        asignarHora("he1", "");
+        asignarHora("hs1", "");
+        asignarHora("he2", "");
+        asignarHora("hs2", "");
+        alertSMS("El código de promotor no existe en la base de datos");
+        eliminarLoader();
+        return false;
       }
     }
 
-    function getPromotor() {
-      return new Promise((resolve, reject) => {
-        crearLoader();
-        let codnomina = document.getElementById("codnomina").value;
-        let promotor = [];
-
-        arrayGlobal.forEach(elemento => {
-          if (elemento[0] == codnomina) {
-            promotor.push(elemento);
-          }
-        });
-
-        if (promotor.length > 0) {
-          banPromotor = 1;
-          document.getElementById("namePromotor").innerHTML = promotor[0][1].toString().toUpperCase();
-
-          google.script.run
-            .withSuccessHandler(function (marcaciones) {
-              asignarIcono("e1", marcaciones.E1.estado);
-              asignarIcono("s1", marcaciones.S1.estado);
-              asignarIcono("e2", marcaciones.E2.estado);
-              asignarIcono("s2", marcaciones.S2.estado);
-              asignarHora("he1", marcaciones.E1.hora);
-              asignarHora("hs1", marcaciones.S1.hora);
-              asignarHora("he2", marcaciones.E2.hora);
-              asignarHora("hs2", marcaciones.S2.hora);
-              eliminarLoader();
-              resolve(true); // <- IMPORTANTE
-            })
-            .withFailureHandler(function (error) {
-              console.error("Error al obtener marcaciones: ", error.message);
-              alertSMS("Error al obtener marcaciones, vuelva a intentarlo");
-              eliminarLoader();
-              reject(false); // <- IMPORTANTE
-            })
-            .obtenerMarcacionesDelDia(codnomina);
-        } else {
-          banPromotor = 0;
-          document.getElementById("namePromotor").innerHTML = "";
-          document.getElementById("fecha").value = "";
-          document.getElementById("hora").value = "";
-          document.getElementById("coordenadas").value = "";
-          document.getElementById("pathIMG").value = "";
-          document.getElementById("mapa").value = "";
-          asignarIcono("e1", "");
-          asignarIcono("s1", "");
-          asignarIcono("e2", "");
-          asignarIcono("s2", "");
-          asignarHora("he1", "");
-          asignarHora("hs1", "");
-          asignarHora("he2", "");
-          asignarHora("hs2", "");
-          alertSMS("El código de promotor no existe en la base de datos");
-          eliminarLoader();
-          resolve(false); // <- RETORNA FALSO
-        }
-      });
-    }
 
     function setDate(){
       let date = new Date();      
@@ -462,12 +438,11 @@ var nsRegistro=(function(){
       latitude='';
       longitude='';
     }
-
-    inicializar();
     
     /******************************************************************************************************/
      return{
       procesarFormulario
     };
+    
   })();
   </script>
