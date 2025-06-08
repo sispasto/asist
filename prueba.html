@@ -25,22 +25,16 @@
 
       fetch("https://script.google.com/a/macros/envia.co/s/AKfycbwIKvBAt3GBmcm5jjOrcCe5St-jRi7ETsd_SQEiOBdjdTpMvcJZlL_AwTrPMoiAwShL/exec", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: new URLSearchParams({
           nombre: nombre,
           edad: edad
         })
       })
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("respuesta").textContent = JSON.stringify(data, null, 2);
-      })
-      .catch(error => {
-        document.getElementById("respuesta").textContent = "Error: " + error.message;
-      });
-    }
+      .then(r => r.json())
+      .then(data => console.log(data))
+      .catch(err => console.error(err));
+  
   </script>
 </body>
 </html>
