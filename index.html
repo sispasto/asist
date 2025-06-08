@@ -167,7 +167,7 @@
     <main class="container-fluid p-0 m-0 text-center" id="App"></main>
     <script src="js/main.js"></script>   
 
-    <script>     
+    <script> 
       sessionStorage.setItem('nombreUsuario', 'Invitado');//Creo variable de session para usuario
       sessionStorage.setItem('codigoUsuario', '0');// inicia en cero quiere decir que no se ha logeado
       sessionStorage.setItem('rol',0)//No se ha logueado ningun usuario
@@ -198,7 +198,7 @@
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
           },
           body: new URLSearchParams({
-            accion: 'login', // 
+            action: 'login', // 
             usuario: usuario,
             clave: clave
           })
@@ -218,6 +218,9 @@
               sessionStorage.setItem('rol', 1);
               const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
               loginModal.hide();
+              const navbarCollapse = document.getElementById('navbarText');
+              const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) || new bootstrap.Collapse(navbarCollapse, { toggle: false });
+              bsCollapse.hide();
               alertSMS("Autenticación correcta");
             } else {
               document.getElementById('navbarItemsDefault').style.display = 'none';
@@ -229,6 +232,9 @@
               sessionStorage.setItem('rol', 2);
               const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
               loginModal.hide();
+              const navbarCollapse = document.getElementById('navbarText');
+              const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) || new bootstrap.Collapse(navbarCollapse, { toggle: false });
+              bsCollapse.hide();
               alertSMS("Autenticación correcta");
             }
           } else {
@@ -258,6 +264,8 @@
         document.getElementById('password').value='';  
         document.getElementById('newPassword').value='';
         document.getElementById('confirmNewPassword').value='';    
+        const navbarCollapse = document.getElementById('navbarText');
+        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) || new bootstrap.Collapse(navbarCollapse, { toggle: false });
         bsCollapse.hide();
         getHome();
         alertSMS("Sesion cerrada correctamente");
@@ -277,7 +285,7 @@
               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
             body: new URLSearchParams({
-              accion: 'updatePassword',
+              action: 'updatePassword',
               usuario: usuario,
               claveNueva: claveNueva
             })
@@ -286,7 +294,11 @@
           .then(data => {
             if (data.status === 'success') {
               changePasswordModal.hide();
+              
+              const navbarCollapse = document.getElementById('navbarText');
+              const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) || new bootstrap.Collapse(navbarCollapse, { toggle: false });
               bsCollapse.hide();
+
               alertSMS("Clave actualizada exitosamente");
             } else {
               alertSMS(data.mensaje || "No se pudo actualizar la clave");
