@@ -192,25 +192,23 @@
         validarUsuario(username, password);
       }
 
-      function validarUsuario() {
-        const usuario = document.getElementById('username').value;
-        const clave = document.getElementById('password').value;
-
-        fetch('https://script.google.com/a/macros/envia.co/s/AKfycbwIKvBAt3GBmcm5jjOrcCe5St-jRi7ETsd_SQEiOBdjdTpMvcJZlL_AwTrPMoiAwShL/exec', {
+      function validarUsuario(usuario, clave) {
+        fetch('https://script.google.com/a/macros/envia.co/s/AKfycbwTXylM3DyLfUvtYshnF5OtwOXZ0E-UoHiCvMWrrXhWs4aWqL8O1WdkbMTDuLmmiT27/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
           },
           body: new URLSearchParams({
-            action: 'autenticar',
+            accion: 'login', // 👈 CAMBIADO a "accion"
             usuario: usuario,
             clave: clave
           })
         })
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            const resultado = data.data;
+          if (data.status === 'success') {
+            const resultado = data.usuario; // 👈 CAMBIADO a "usuario"
+
             if (resultado.tipo === 'admin') {
               document.getElementById('navbarItemsDefault').style.display = 'none';
               document.getElementById('navbarItemsUser').style.display = 'none';
@@ -219,7 +217,7 @@
               document.getElementById('textUser').textContent = resultado.nombre;
               sessionStorage.setItem('codigoUsuario', resultado.codigo);
               sessionStorage.setItem('rol', 1);
-              var loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+              const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
               loginModal.hide();
               alertSMS("Autenticación correcta");
             } else {
@@ -230,12 +228,12 @@
               document.getElementById('textUser').textContent = resultado.nombre;
               sessionStorage.setItem('codigoUsuario', resultado.codigo);
               sessionStorage.setItem('rol', 2);
-              var loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+              const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
               loginModal.hide();
               alertSMS("Autenticación correcta");
             }
           } else {
-            alertSMS(data.message || "Usuario o clave incorrectos");
+            alertSMS(data.mensaje || "Usuario o clave incorrectos"); // 👈 CAMBIADO a "mensaje"
           }
         })
         .catch(error => {
@@ -243,6 +241,7 @@
           alertSMS("Error en la conexión");
         });
       }
+
 
 
       // Función para cerrar sesión
