@@ -1,40 +1,42 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Prueba API Google Apps Script</title>
+  <title>Prueba de Google Apps Script sin CORS</title>
 </head>
 <body>
-  <h1>Probar API REST de Google Apps Script</h1>
+  <h1>Enviar datos a GAS</h1>
+  <form id="formulario">
+    <label>Nombre: <input type="text" name="nombre" required></label><br><br>
+    <label>Edad: <input type="number" name="edad" required></label><br><br>
+    <button type="submit">Enviar</button>
+  </form>
 
-  <label for="nombre">Nombre:</label>
-  <input type="text" id="nombre" value="Ana"><br><br>
-
-  <label for="edad">Edad:</label>
-  <input type="number" id="edad" value="25"><br><br>
-
-  <button onclick="enviarDatos()">Enviar</button>
-
-  <h2>Respuesta:</h2>
   <pre id="respuesta"></pre>
 
   <script>
-    function enviarDatos() {
-      const nombre = document.getElementById("nombre").value;
-      const edad = document.getElementById("edad").value;
+    const form = document.getElementById('formulario');
+    const respuesta = document.getElementById('respuesta');
 
-      fetch("https://script.google.com/a/macros/envia.co/s/AKfycbwIKvBAt3GBmcm5jjOrcCe5St-jRi7ETsd_SQEiOBdjdTpMvcJZlL_AwTrPMoiAwShL/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: new URLSearchParams({
-          nombre: nombre,
-          edad: edad
-        })
-      })
-      .then(r => r.json())
-      .then(data => console.log(data))
-      .catch(err => console.error(err));
-  
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const datos = new URLSearchParams(new FormData(form));
+      try {
+        const res = await fetch('https://script.google.com/a/macros/envia.co/s/AKfycbwIKvBAt3GBmcm5jjOrcCe5St-jRi7ETsd_SQEiOBdjdTpMvcJZlL_AwTrPMoiAwShL/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: datos
+        });
+
+        const json = await res.json();
+        respuesta.textContent = JSON.stringify(json, null, 2);
+      } catch (err) {
+        respuesta.textContent = 'Error: ' + err.message;
+      }
+    });
   </script>
 </body>
 </html>
