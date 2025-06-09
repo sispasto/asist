@@ -1,6 +1,6 @@
 {
-  "name": "Mi Web App",
-  "short_name": "WebApp",
+  "name": "Asist",
+  "short_name": "Asist",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
