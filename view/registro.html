@@ -246,8 +246,7 @@ var nsRegistro=(function(){
 
     async function procesarFormulario(event, formulario) {
       event.preventDefault();
-      
-      dataForm = Object.fromEntries(new FormData(formulario).entries());
+            
       let codnomina = document.getElementById("codnomina").value;
 
       if (codnomina === "") {
@@ -341,10 +340,10 @@ var nsRegistro=(function(){
     }
 
 
-    function setDate(){
+    function setDate(){ 
       let date = new Date();      
       let hora = date.toLocaleTimeString("es-CO", { hour12: false });  
-      let fecha = date.toLocaleDateString('es-CO');
+      let fecha = date.toLocaleDateString('es-CO');      
       document.getElementById("fecha").value = fecha; //day+'-'+month+'-'+year;        
       document.getElementById("hora").value = hora ;//hours+':'+minutes;    
     }
@@ -365,7 +364,8 @@ var nsRegistro=(function(){
         
     function successFull(data){ //console.log("devuelta:" + data ); //console.log(data.url); 
       document.getElementById("pathIMG").value = data.url;
-      document.getElementById("IDImg").value = data.fileID;       
+      document.getElementById("IDImg").value = data.fileID;    
+      dataForm = Object.fromEntries(new FormData(formulario).entries());   
       enviarFormularioConFetch(dataForm); 
     }
 
