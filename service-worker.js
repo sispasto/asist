@@ -1,7 +1,11 @@
-self.addEventListener('install', function(e) {//version 1.0
+const CACHE_NAME = 'app-cache-v1.0';
+
+self.addEventListener('install', function(e) {
   console.log('Service Worker: Installed');
+  self.skipWaiting();
+
   e.waitUntil(
-    caches.open('v1').then(cache => {
+    caches.open(CACHE_NAME).then(cache => {
       return cache.addAll([
         './',
         './index.html',
@@ -15,6 +19,25 @@ self.addEventListener('install', function(e) {//version 1.0
       ]);
     })
   );
+});
+
+self.addEventListener('activate', function(e) {
+  console.log('Service Worker: Activated');
+
+  e.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames
+          .filter(name => name.startsWith('app-cache-v') && name !== CACHE_NAME)
+          .map(name => {
+            console.log('Service Worker: Deleting old cache', name);
+            return caches.delete(name);
+          })
+      );
+    })
+  );
+
+  return self.clients.claim();
 });
 
 self.addEventListener('fetch', function(e) {
