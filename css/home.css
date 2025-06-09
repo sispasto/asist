@@ -1,4 +1,8 @@
       /* Estilos para mejorar el diseño del formulario */
+      html, body {
+        height: auto;
+        overflow-y: auto;
+      }
       .modal-dialog {
         margin-top: 70px !important;
       }
