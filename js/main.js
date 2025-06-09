@@ -5,6 +5,7 @@ var folderPathIMG="";//variable que guarda id de carpeta donde se guardan las im
 const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec";
 
 document.addEventListener("DOMContentLoaded", async function () {   
+  setNavbarCollapse();
   getHome();
 });
 
@@ -115,7 +116,7 @@ function eliminarLoader() {
 }
 
 // Este código también puede ir en el archivo .js si no requiere esperar a que HTML cargue
-document.addEventListener('DOMContentLoaded', () => {
+function setNavbarCollapse(){
   const navLinks = document.querySelectorAll('.nav-item');
   const menuToggle = document.getElementById('navbarText');
   const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
@@ -125,4 +126,5 @@ document.addEventListener('DOMContentLoaded', () => {
       bsCollapse.toggle();
     });
   });
-});
+}
+
