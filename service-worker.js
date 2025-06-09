@@ -1,4 +1,4 @@
-self.addEventListener('install', function(e) {
+self.addEventListener('install', function(e) {//version 1.0
   console.log('Service Worker: Installed');
   e.waitUntil(
     caches.open('v1').then(cache => {
