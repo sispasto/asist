@@ -7,6 +7,7 @@ const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65e
 document.addEventListener("DOMContentLoaded", async function () {   
   setNavbarCollapse();
   getHome();
+  getArrayPromotors();
 });
 
 function getRegistro() {
@@ -49,19 +50,15 @@ function alertSMS(texto) {
 }
 
 function getInforme() {
+    
   let main = document.getElementById('App');
   removeALLChilds(main);
-  let frmInformes = document.getElementById('informe');
-  let frmvmodal = document.getElementById('vmodal');
-  main.appendChild(frmvmodal.content.cloneNode(true));
-  main.appendChild(frmInformes.content.cloneNode(true));
-  let listames = document.getElementById('listames');
-  let listayear = document.getElementById('listyear');
-  let fechaActual = new Date();
-  let year = fechaActual.getFullYear();
-  let mes = fechaActual.getMonth() + 1;
-  listames.value = mes;
-  listayear.value = year;
+  const informe = document.createElement('informe-component');
+  informe.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
+  main.appendChild(informe);
+  const vmodal = document.createElement('vmodal-component');
+  vmodal.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
+  main.appendChild(vmodal); 
 }
 
 function getNomina() {
@@ -113,6 +110,14 @@ function crearLoader() {
 function eliminarLoader() {
   let loader = document.getElementById('containerloader');
   if (loader) loader.remove();
+}
+
+function cerrarModalesActivos() {
+  const allModals = document.querySelectorAll('.modal.show');
+  allModals.forEach(modal => {
+    const instance = bootstrap.Modal.getInstance(modal);
+    if (instance) instance.hide();
+  });
 }
 
 // Este código también puede ir en el archivo .js si no requiere esperar a que HTML cargue

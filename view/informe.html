@@ -1,4 +1,3 @@
-<template id="informe">
   <div>  
     <div class="container-fluid">
       <h3></h3><!--<div class="output"> </div>-->    
@@ -131,7 +130,7 @@
         document.getElementById("namePromotor").style.display = "block";
         document.getElementById("namePromotor").value = promotor[0][1].toString().toUpperCase();
       }
-      else{ banPromotor=0;
+      else{ banPromotor=0; alert("");
         document.getElementById("namePromotor").value= "";
       }        
     }//fin consulta de Promotor
@@ -157,12 +156,42 @@
       if( namePromotor!="" && mes > 0 && year > 0 ){
         crearLoader();// se empieza a hacer la consulta
         let codnomina = document.getElementById("codnomina").value;
-        google.script.run.withSuccessHandler(success).filtarFechas2(codnomina,mes,year); //Obtiene filtro datos
+        obtenerDatosFiltrados(codnomina,mes,year);        
       }
       else{
         alertSMS("Error: Ingrese un código de promotor valido y elija el año y un mes de la lista desplegable!");
       }
     }
+
+    async function obtenerDatosFiltrados(codnomina, mes, year) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: new URLSearchParams({
+            action: 'filtarFechas2',
+            codnomina: codnomina,
+            mes: mes,
+            year: year
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          success(data.data);
+          //console.log("Datos filtrados:", data.data);
+          // Aquí puedes hacer algo con data.data
+        } else {
+          console.log(data.mensaje || "Error al obtener los datos filtrados");
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
 
     function success( data ){       
       dataTable = data;  // Almacenar los datos en dataTable
@@ -244,6 +273,24 @@
       }
     }
 
+    function inicializar() {
+      const fechaActual = new Date();
+      const mes = fechaActual.getMonth() + 1;
+      const year = fechaActual.getFullYear();
+
+      const listames = document.getElementById('listames');
+      const listayear = document.getElementById('listyear');
+
+      if (listames && listayear) {
+        listames.value = mes;
+        listayear.value = year;
+      } else {
+        console.warn('No se encontraron los elementos listames o listayear');
+      }
+    }
+
+    inicializar();    
+
     return {
       consultarDatos: consultarDatos,
       mostrarFoto: mostrarFoto,
@@ -252,4 +299,3 @@
 
   })();
   </script>
-</template>

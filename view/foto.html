@@ -12,7 +12,7 @@
       object-fit: cover;
     }
   </style>
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
@@ -90,6 +90,7 @@
       };
 
       async function init() {
+        if (objCamera) return; // Ya hay una cámara activa, no vuelvas a abrir
         try {
           const stream = await navigator.mediaDevices.getUserMedia(constraints);
           handleSuccess(stream);
@@ -124,6 +125,7 @@
       });
 
       function openCamera() {
+        cerrarModalesActivos();
         const bsModal = new bootstrap.Modal(myModalEl);
         bsModal.show(); // <-- solo muestra el modal
       }

@@ -1,4 +1,3 @@
-<template id="nomina">
   <div>  
     <div class="container-fluid">     
       <h3></h3><!--<div class="output"> </div>-->     
@@ -72,12 +71,38 @@
           var fechaISOInicio = new Date(fechaInicio).toISOString().split('T')[0]; // Formato YYYY-MM-DD
           var fechaISOFin = new Date(fechaFin).toISOString().split('T')[0]; // Formato YYYY-MM-DD         
           crearLoader(); // se empieza a hacer la consulta
-          google.script.run.withSuccessHandler(success).filtarFechasPorRango(fechaISOInicio, fechaISOFin); 
+          obtenerDatosPorRango(fechaISOInicio,fechaISOFin);
 
       } else {
           alertSMS("Error: Ingrese ambas fechas inicial y final!");
       }
       
+    }
+
+    async function obtenerDatosPorRango(fechaInicial, fechaFinal) {
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+          },
+          body: new URLSearchParams({
+            action: 'filtrarFechasPorRango',
+            fechaInicial: fechaInicial,
+            fechaFinal: fechaFinal
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          success(data.data);       
+        } else {
+          console.error(data.mensaje || "Error al obtener los datos por rango");
+        }
+      } catch (error) {
+        console.error('Error en obtenerDatosPorRango:', error);
+      }
     }
 
     function success(data) {
@@ -199,4 +224,3 @@
 
   })();
   </script>
-</template>
