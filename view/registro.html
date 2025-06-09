@@ -306,7 +306,7 @@ var nsRegistro=(function(){
             asignarHora("hs2", marcaciones.S2.hora);
             eliminarLoader();
             return true;
-          } else {
+          } else { eliminarLoader();
             throw new Error(result.mensaje || "Error al obtener marcaciones.");
           }
 
@@ -316,7 +316,7 @@ var nsRegistro=(function(){
           eliminarLoader();
           return false;
         }
-
+        eliminarLoader();
       } else {
         banPromotor = 0;
         document.getElementById("namePromotor").innerHTML = "";
