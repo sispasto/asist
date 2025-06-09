@@ -97,11 +97,14 @@
 
         if (data.status === 'success') {
           success(data.data);       
+          eliminarLoader();
         } else {
           console.error(data.mensaje || "Error al obtener los datos por rango");
+          eliminarLoader();
         }
       } catch (error) {
         console.error('Error en obtenerDatosPorRango:', error);
+        eliminarLoader();
       }
     }
 
@@ -196,24 +199,53 @@
       }
     }
 
-    function generarCSV() {
+    async function generarCSV() {
       var fechaInicio = document.getElementById('fechaInicio').value;
-      var fechaFin = document.getElementById('fechaFinal').value;      
-      
+      var fechaFin = document.getElementById('fechaFinal').value;
       if (fechaInicio && fechaFin) {// Comprobar si se han seleccionado ambas fechas
+        
+        var fechaISOInicio = new Date(fechaInicio).toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        var fechaISOFin = new Date(fechaFin).toISOString().split('T')[0]; // Formato YYYY-MM-DD         
+        crearLoader(); // se empieza a hacer la consulta
 
-          var fechaISOInicio = new Date(fechaInicio).toISOString().split('T')[0]; // Formato YYYY-MM-DD
-          var fechaISOFin = new Date(fechaFin).toISOString().split('T')[0]; // Formato YYYY-MM-DD         
-          crearLoader(); // se empieza a hacer la consulta
-          google.script.run.withSuccessHandler(function(url) {
+        try {           
+
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            body: new URLSearchParams({
+              action: 'generarCSV',
+              fechaInicial: fechaISOInicio,
+              fechaFinal: fechaISOFin
+            })
+          });
+
+          const data = await response.json(); 
+
+          if (data.status === 'success' && data.downloadUrl) {
+            // Crear enlace temporal para descargar el archivo automáticamente
+            const link = document.createElement('a');
+            link.href = data.downloadUrl;
+            link.download = 'Informe_Nómina.csv'; // Nombre sugerido para la descarga
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            console.log("Descarga iniciada.");
             eliminarLoader();
-            window.open(url, '_blank');            
-          }).generarCSV(fechaISOInicio, fechaISOFin); // Pasa dataTable a la función generarExcel
-
+          } else {
+            console.error(data.mensaje || "Error al generar CSV");
+             eliminarLoader();
+          }
+        } catch (error) {
+          console.error('Error en generarCSV:', error);
+          eliminarLoader();
+        }
       } else {
           alertSMS("Error: Ingrese ambas fechas inicial y final!");
       }
-    }
+    }    
 
     return {
       consultarDatos: consultarDatos,

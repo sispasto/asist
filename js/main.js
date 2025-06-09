@@ -49,8 +49,7 @@ function alertSMS(texto) {
   toast.show();
 }
 
-function getInforme() {
-    
+function getInforme() {    
   let main = document.getElementById('App');
   removeALLChilds(main);
   const informe = document.createElement('informe-component');
@@ -61,13 +60,15 @@ function getInforme() {
   main.appendChild(vmodal); 
 }
 
-function getNomina() {
+function getNomina() {  
   let main = document.getElementById('App');
   removeALLChilds(main);
-  let frmInformes = document.getElementById('nomina');
-  let frmvmodal = document.getElementById('vmodal');
-  main.appendChild(frmvmodal.content.cloneNode(true));
-  main.appendChild(frmInformes.content.cloneNode(true));
+  const nomina = document.createElement('nomina-component');
+  nomina.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
+  main.appendChild(nomina);
+  const vmodal = document.createElement('vmodal-component');
+  vmodal.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
+  main.appendChild(vmodal); 
 }
 
 async function getArrayPromotors() {
