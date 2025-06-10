@@ -1,7 +1,7 @@
 const templateCache = {};
 var arrayGlobal = []; //array de promotores
 var folderPathIMG="";//variable que guarda id de carpeta donde se guardan las imagenes
-var versionApp="1.5";
+var versionApp="1.2";
 const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec";
 
 function getRegistro() {
