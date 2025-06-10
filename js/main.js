@@ -18,11 +18,14 @@ function getRegistro() {
 function getHome() {
   let main = document.getElementById('App');
   removeALLChilds(main);
-
   const componente = document.createElement('bienvenida-component');
   componente.setAttribute('container', '#App'); // <-- aquí pasas el parámetro
+  componente.versionApp = versionApp; // <-- Aquí se pasa la versión antes de renderizar
   main.appendChild(componente);
+
+  /******************************************************** */
 }
+
 
 
 function errorUpload(data) {
@@ -147,12 +150,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.error('Error al registrar el Service Worker:', error);
       });
   }
-  /************Para forzar actualizacion de PWA**************/
-    const versionLabel = document.getElementById("version-label");
-    if (versionLabel) {
-      versionLabel.textContent = `Asist v${versionApp}`;//Versión de la App
-    }
-  /******************************************************** */
+  /************Para forzar actualizacion de PWA**************/    
   setNavbarCollapse();
   getHome();
   getArrayPromotors();

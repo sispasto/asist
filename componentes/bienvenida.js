@@ -29,7 +29,13 @@ class BienvenidaComponent extends HTMLElement {
       //this.shadowRoot.appendChild(template.content.cloneNode(true));Encapsula todo independiente todo css y js por eso lo comente
       this.innerHTML = '';
       this.appendChild(template.content.cloneNode(true));
-
+      // Ahora insertamos la versión
+      if (this.versionApp) {
+        const versionLabel = this.querySelector('#version-label');
+        if (versionLabel) {
+          versionLabel.textContent = `Asist v${this.versionApp}`;
+        }
+      }
       // Limpiar scripts anteriores en el contenedor
       container.querySelectorAll('script[data-dynamic="true"]').forEach(s => s.remove());
 
@@ -49,6 +55,15 @@ class BienvenidaComponent extends HTMLElement {
       console.error('Error al cargar bienvenida.html:', error);
     }
   }
+
+  set versionApp(value) {
+    this._versionApp = value;
+  }
+
+  get versionApp() {
+    return this._versionApp;
+  }
+  
 }
 
 customElements.define('bienvenida-component', BienvenidaComponent);
