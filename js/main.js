@@ -1,7 +1,7 @@
 const templateCache = {};
 var arrayGlobal = []; //array de promotores
 var folderPathIMG="";//variable que guarda id de carpeta donde se guardan las imagenes
-
+var versionApp="1.5";
 const API_URL = "https://script.google.com/a/macros/envia.co/s/AKfycbxYk37eyW65emvTSs2hYuEg_Xo8s5UORfbVf6Wc0wxS9tqRw6nvM8RN19deuihIpbYO/exec";
 
 function getRegistro() {
@@ -131,21 +131,28 @@ function setNavbarCollapse(){
 document.addEventListener("DOMContentLoaded", async function () {   
   /************Para forzar actualizacion de PWA**************/
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => {
-          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-            console.log('Nueva versión detectada, recargando...');
-            window.location.reload(); // Puedes reemplazar esto con una notificación
-          }
+    navigator.serviceWorker.register('/asist/service-worker.js', { scope: '/asist/' })
+      .then(reg => {
+        reg.onupdatefound = () => {
+          const newSW = reg.installing;
+          newSW.onstatechange = () => {
+            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('Nueva versión detectada, recargando...');
+              window.location.reload(); // Puedes reemplazar esto con una notificación
+            }
+          };
         };
-      };
-    }).catch(error => {
-      console.error('Error al registrar el Service Worker:', error);
-    });
+      })
+      .catch(error => {
+        console.error('Error al registrar el Service Worker:', error);
+      });
   }
   /************Para forzar actualizacion de PWA**************/
+    const versionLabel = document.getElementById("version-label");
+    if (versionLabel) {
+      versionLabel.textContent = `Asist v${versionApp}`;//Versión de la App
+    }
+  /******************************************************** */
   setNavbarCollapse();
   getHome();
   getArrayPromotors();
