@@ -245,11 +245,17 @@ var nsRegistro=(function(){
 
     async function procesarFormulario(event, formulario) {
       event.preventDefault();
-            
+      
+      const boton = document.getElementById("frmSubmit");      
+      boton.classList.add("disabled");
+      boton.disabled = true;
+
       let codnomina = document.getElementById("codnomina").value;
 
-      if (codnomina === "") {
+      if (codnomina === "") { 
         alertSMS("Por favor diligencie su código de nómina");
+        boton.classList.remove("disabled");      
+        boton.disabled = false;
         return;
       }
 
@@ -265,14 +271,17 @@ var nsRegistro=(function(){
           setDate();
           getLocation();
         }
-
+        boton.classList.remove("disabled");      
+        boton.disabled = false; 
       } catch (e) {
+        boton.classList.remove("disabled");      
+        boton.disabled = false;
         console.error("Error al procesar el formulario:", e);
         alertSMS("Ocurrió un error inesperado al procesar el formulario.");
       }
     }
 
-    async function getPromotor() {
+    async function getPromotor() {  
       crearLoader();
       const codnomina = document.getElementById("codnomina").value;
       const promotor = arrayGlobal.filter(elemento => elemento[0] == codnomina);
@@ -348,26 +357,6 @@ var nsRegistro=(function(){
     }
 
     /*************************************Guardar Imagen***************************************************/
-    function saveImage(){ 
-      if( nsModal.numClic > 0 ){
-        crearLoader(); 
-        let canvas = nsRegistro.getCanvas();
-        let dataURi = canvas.toDataURL('image/png');
-        let idImg = document.getElementById("codnomina").value + "-" + document.getElementById("fecha").value;  
-        subirImagen(dataURi,idImg,folderPathIMG);  
-      }
-      else{
-        alertSMS("La fotografía es necesaria");
-      }        
-    }//Fin función saveImage      
-        
-    function successFull(data){ //console.log("devuelta:" + data ); //console.log(data.url); 
-      document.getElementById("pathIMG").value = data.url;
-      document.getElementById("IDImg").value = data.fileID;    
-      dataForm = Object.fromEntries(new FormData(formulario).entries());   
-      enviarFormularioConFetch(dataForm); 
-    }
-
     function enviarFormularioConFetch() {
       fetch(API_URL, {
         method: 'POST',
@@ -388,6 +377,13 @@ var nsRegistro=(function(){
       });
     }
 
+    function successFull(data){ //console.log("devuelta:" + data ); //console.log(data.url); 
+      document.getElementById("pathIMG").value = data.url;
+      document.getElementById("IDImg").value = data.fileID;    
+      dataForm = Object.fromEntries(new FormData(formulario).entries());   
+      enviarFormularioConFetch(dataForm); 
+    }
+
     function errorUpload(data){ 
       eliminarLoader();
       document.getElementById("fecha").value = "";
@@ -397,6 +393,20 @@ var nsRegistro=(function(){
       latitude='';
       longitude='';
     }
+    
+    function saveImage(){ 
+      if( nsModal.numClic > 0 ){
+        crearLoader(); 
+        let canvas = nsRegistro.getCanvas();
+        //let dataURi = canvas.toDataURL('image/png');
+        let dataURi = canvas.toDataURL('image/jpeg', 0.6);
+        let idImg = document.getElementById("codnomina").value + "-" + document.getElementById("fecha").value;  
+        subirImagen(dataURi,idImg,folderPathIMG);  
+      }
+      else{
+        alertSMS("La fotografía es necesaria");
+      }        
+    }//Fin función saveImage   
 
     async function subirImagen(dataURI, idImg, folderPathIMG) {
       try {
